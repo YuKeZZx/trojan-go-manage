@@ -9,7 +9,7 @@ import (
 
 // 连接mysql使用
 
-type Mysqlconfig struct {
+type mysqlconfig struct {
 	dbuser string
 	dbPWD  string
 	dburl  string
@@ -27,8 +27,8 @@ var (
 	upload   int64
 )
 
-func MysqlOpen() {
-	m := Mysqlconfig{
+func mysqlcon() (db *sql.DB) {
+	m := mysqlconfig{
 		dbuser: "root",
 		dbPWD:  "trojan",
 		dburl:  "ydzx.club",
@@ -44,6 +44,21 @@ func MysqlOpen() {
 	if err != nil {
 		panic(err)
 	}
+	return db
+}
+
+type Userconfig struct {
+	id       int
+	Username string
+	passwd   string
+	Quota    int64
+	Download int64
+	Upload   int64
+}
+
+func Getuserlist() []Userconfig {
+	db := mysqlcon()
+	// 表字段
 
 	rows, err := db.Query("select id,username,password,quota,download,upload from users")
 	if err != nil {
@@ -55,16 +70,26 @@ func MysqlOpen() {
 
 		}
 	}(rows)
-	//println("内存", rows)
+
 	for rows.Next() {
 		err := rows.Scan(&id, &username, &passwd, &quota, &download, &upload)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("\nid:%d\n用户:%s\n密码:%s\n限制速度:%d\n总上传使用:%d\n总下载使用:%d", id, username, passwd, quota, upload, download)
+		//log.Printf("\nid:%d\n用户:%s\n密码:%s\n限制速度:%d\n总上传使用:%d\n总下载使用:%d", id, username, passwd, quota, upload, download)
 	}
+	var userlist []Userconfig
+	userlist = append(userlist, Userconfig{
+		id:       id,
+		Username: username,
+		passwd:   passwd,
+		Quota:    quota,
+		Download: download,
+		Upload:   upload,
+	})
 	err = rows.Err()
 	if err != nil {
 		log.Fatal(err)
 	}
+	return userlist
 }
