@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"log"
 )
 
@@ -17,17 +18,11 @@ type mysqlconfig struct {
 	dbname string
 }
 
-// users表字段
-var (
-	id       int
-	username string
-	passwd   string
-	quota    int64
-	download int64
-	upload   int64
-)
+// 数据库指针
+var db *sqlx.DB
 
-func mysqlcon() (db *sql.DB) {
+// 数据库初始化
+func init() {
 	m := mysqlconfig{
 		dbuser: "root",
 		dbPWD:  "trojan",
@@ -36,17 +31,14 @@ func mysqlcon() (db *sql.DB) {
 		dbname: "trojan",
 	}
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", m.dbuser, m.dbPWD, m.dburl, m.dbport, m.dbname)
-	db, err := sql.Open("mysql", dsn)
+	datebase, err := sqlx.Open("mysql", dsn)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-	return db
+	db = datebase
 }
 
+// Userconfig 用户表
 type Userconfig struct {
 	id       int
 	Username string
@@ -56,10 +48,18 @@ type Userconfig struct {
 	Upload   int64
 }
 
+// 查询用户列表
 func Getuserlist() []Userconfig {
-	db := mysqlcon()
 	// 表字段
-
+	// users表字段
+	var (
+		id       int
+		username string
+		passwd   string
+		quota    int64
+		download int64
+		upload   int64
+	)
 	rows, err := db.Query("select id,username,password,quota,download,upload from users")
 	if err != nil {
 		log.Fatal(err)
@@ -76,7 +76,6 @@ func Getuserlist() []Userconfig {
 		if err != nil {
 			log.Fatal(err)
 		}
-		//log.Printf("\nid:%d\n用户:%s\n密码:%s\n限制速度:%d\n总上传使用:%d\n总下载使用:%d", id, username, passwd, quota, upload, download)
 	}
 	var userlist []Userconfig
 	userlist = append(userlist, Userconfig{
@@ -92,4 +91,24 @@ func Getuserlist() []Userconfig {
 		log.Fatal(err)
 	}
 	return userlist
+}
+
+func Insetuser() {
+	sql := "INSERT INTO `trojan`.`users` (`username`, `password`,`quota`) VALUES (?,?,?)"
+	value := [2]string{"zhao", "dsadas"}
+	//value[1] = crypto.SHA224.String("sdad")
+	quota := 0
+	r, err := db.Exec(sql, value[0], value[1], quota)
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	id, err := r.LastInsertId()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	log.Println("增加成功,id为:", id)
 }
