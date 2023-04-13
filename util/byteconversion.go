@@ -1,4 +1,4 @@
-package unitconversion
+package util
 
 import (
 	"fmt"

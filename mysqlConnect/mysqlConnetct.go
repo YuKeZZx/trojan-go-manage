@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"log"
+	"trojan-go-manage/util"
 )
 
 // 连接mysql使用
@@ -48,7 +49,7 @@ type Userconfig struct {
 	Upload   int64
 }
 
-// 查询用户列表
+// Getuserlist 查询用户列表
 func Getuserlist() []Userconfig {
 	// 表字段
 	// users表字段
@@ -93,12 +94,14 @@ func Getuserlist() []Userconfig {
 	return userlist
 }
 
+// Insetuser 新增用户函数
 func Insetuser() {
-	sql := "INSERT INTO `trojan`.`users` (`username`, `password`,`quota`) VALUES (?,?,?)"
+	insql := "INSERT INTO `trojan`.`users` (`username`, `password`,`quota`) VALUES (?,?,?)"
 	value := [2]string{"zhao", "dsadas"}
-	//value[1] = crypto.SHA224.String("sdad")
+	value[1] = util.GetSha224(value[1])
+
 	quota := 0
-	r, err := db.Exec(sql, value[0], value[1], quota)
+	r, err := db.Exec(insql, value[0], value[1], quota)
 
 	if err != nil {
 		log.Fatal(err)
