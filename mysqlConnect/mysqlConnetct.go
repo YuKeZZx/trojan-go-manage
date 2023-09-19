@@ -25,10 +25,10 @@ var db *sqlx.DB
 // 数据库初始化
 func init() {
 	m := mysqlconfig{
-		dbuser: "root",
-		dbPWD:  "trojan",
-		dburl:  "ydzx.club",
-		dbport: 1035,
+		dbuser: "admin",
+		dbPWD:  "keoSt2DVSSIj0c0G6fog",
+		dburl:  "yudou.ceef9olzngin.ap-northeast-2.rds.amazonaws.com",
+		dbport: 3306,
 		dbname: "trojan",
 	}
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", m.dbuser, m.dbPWD, m.dburl, m.dbport, m.dbname)
@@ -71,22 +71,21 @@ func Getuserlist() []Userconfig {
 
 		}
 	}(rows)
-
+	var userlist []Userconfig
 	for rows.Next() {
 		err := rows.Scan(&id, &username, &passwd, &quota, &download, &upload)
 		if err != nil {
 			log.Fatal(err)
 		}
+		userlist = append(userlist, Userconfig{
+			id:       id,
+			Username: username,
+			passwd:   passwd,
+			Quota:    quota,
+			Download: download,
+			Upload:   upload,
+		})
 	}
-	var userlist []Userconfig
-	userlist = append(userlist, Userconfig{
-		id:       id,
-		Username: username,
-		passwd:   passwd,
-		Quota:    quota,
-		Download: download,
-		Upload:   upload,
-	})
 	err = rows.Err()
 	if err != nil {
 		log.Fatal(err)

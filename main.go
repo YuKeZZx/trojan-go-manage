@@ -12,10 +12,14 @@ func main() {
 	//mysqlConnect.MysqlOpen()
 	userlist := mysqlConnect.Getuserlist()
 	var user mysqlConnect.Userconfig
-	user = userlist[0]
-	totol := fmt.Sprintf("用户:%s\t限制流量%s\t使用流量:%s", user.Username, util.Byteconversion(float64(user.Quota)),
-		util.Byteconversion(float64(user.Upload+user.Download)))
-	log.Print(totol)
+
+	for i := 0; i < len(userlist); i++ {
+		user = userlist[i]
+		totol := fmt.Sprintf("用户:%s\t限制流量%s\t使用流量:%s", user.Username, util.Byteconversion(float64(user.Quota)),
+			util.Byteconversion(float64(user.Upload+user.Download)))
+		log.Print(totol)
+	}
+
 	//mysqlConnect.Insetuser()
 	//num := 21474836480.0
 	//log.Print("\t", cruutnum)
