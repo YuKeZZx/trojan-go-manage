@@ -9,6 +9,7 @@ import (
 
 func main() {
 	fmt.Println("开始")
+	mysqlConnect.Insetuser()
 	//mysqlConnect.MysqlOpen()
 	userlist := mysqlConnect.Getuserlist()
 	var user mysqlConnect.Userconfig
@@ -20,7 +21,6 @@ func main() {
 		log.Print(totol)
 	}
 
-	//mysqlConnect.Insetuser()
 	//num := 21474836480.0
 	//log.Print("\t", cruutnum)
 	//mysqlConnect.GetSha224("yukezx0901")

@@ -96,10 +96,10 @@ func Getuserlist() []Userconfig {
 // Insetuser 新增用户函数
 func Insetuser() {
 	insql := "INSERT INTO `trojan`.`users` (`username`, `password`,`quota`) VALUES (?,?,?)"
-	value := [2]string{"zhao", "dsadas"}
+	value := [2]string{"gongsi", "20210312gs"}
 	value[1] = util.GetSha224(value[1])
 
-	quota := 0
+	quota := 20000000000000
 	r, err := db.Exec(insql, value[0], value[1], quota)
 
 	if err != nil {
